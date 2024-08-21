@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import Particles, { initParticlesEngine } from "@tsparticles/react";
 
 import { loadSlim } from "@tsparticles/slim";
+import { LandingNavbar } from "@/components/landing/navbar";
 
 export default function Home() {
   const [init, setInit] = useState(false);
@@ -103,6 +104,8 @@ export default function Home() {
   return (
     <div className="max-w-screen-2xl mx-auto ">
       <div></div>
+
+      <LandingNavbar />
     </div>
   );
 }
