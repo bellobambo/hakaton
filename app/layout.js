@@ -21,6 +21,7 @@ export default function RootLayout({ children }) {
     <ClerkProvider frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}>
       <html lang="en">
         <body className={inter.className}>
+          <SignIn />
           <SignedOut>
             <div className="text-center flex justify-center flex-col items-center mt-[100px] mx-auto  space-y-4">
               <SignInButton mode="modal" forceRedirectUrl="/dashboard">
@@ -39,7 +40,6 @@ export default function RootLayout({ children }) {
               </i>
             </div>
           </SignedOut>
-          <SignIn />
           {children}
         </body>
       </html>
