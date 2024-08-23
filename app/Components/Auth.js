@@ -5,12 +5,15 @@ import { motion } from "framer-motion";
 import Web3 from "web3";
 import Loader from "./Loader";
 import Background from "./Background";
+import { UploadButton } from "@uploadthing/react";
 
 function AuthUser() {
   const { user } = useUser();
 
   const [matricNumber, setMatricNumber] = useState("");
   const [hashedAddress, setHashedAddress] = useState("");
+  const [image, setImage] = useState("");
+  const [Name, setName] = useState("");
   const [balance, setBalance] = useState("");
 
   const handleMatricNumberChange = async (e) => {
@@ -72,6 +75,10 @@ function AuthUser() {
       </div>
     );
   }
+
+  const handleCreateId = async (e) => {
+    e.preventDefault();
+  };
 
   return (
     <motion.div className="mt-[100px]" initial="hidden" animate="visible">
@@ -153,10 +160,17 @@ function AuthUser() {
           custom={4}
         >
           <label className="text-[#7DD3FCB3]">Image (passport photo)</label>
-          <motion.input
-            className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black"
-            type="file"
-            whileFocus={{ scale: 1.05 }}
+          <UploadButton
+            endpoint="imageUploader"
+            onClientUploadComplete={(res) => {
+              console.log("Files: ", res);
+              if (res && Array.isArray(res) && res.length > 0) {
+                setImage(res[0].url);
+              }
+            }}
+            onUploadError={(error) => {
+              alert(`ERROR! ${error.message}`);
+            }}
           />
         </motion.div>
 
