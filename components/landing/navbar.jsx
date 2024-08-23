@@ -7,7 +7,7 @@ import { DiamondPlus } from 'lucide-react'
 export const LandingNavbar = () => {
   return (
     <div className=''>
-        <div className="w-[90%] mx-auto flex justify-between items-center py-2  ">
+        <div className="w-[90%] mx-auto flex justify-between items-center py-3.5  ">
             <Link href="" className='text-2xl font-semibold flex items-center gap-5'>
                 <div>
                     <DiamondPlus />

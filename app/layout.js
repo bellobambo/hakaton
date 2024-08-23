@@ -12,8 +12,8 @@ import SignIn from "./Components/SignIn";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "Campus University ID",
-  description: "Student Identity",
+  title: "Unitoken",
+  description: "Seamless Campus Experience: Identity, Payments, and Access",
 };
 
 export default function RootLayout({ children }) {
