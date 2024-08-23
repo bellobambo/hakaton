@@ -21,9 +21,11 @@ export default function RootLayout({ children }) {
     <ClerkProvider frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}>
       <html lang="en">
         <body className={inter.className}>
-          <SignIn />
+          {/* <SignIn /> */}
 
+          <div className="max-w-screen-2xl mx-auto">
           {children}
+          </div>
         </body>
       </html>
     </ClerkProvider>

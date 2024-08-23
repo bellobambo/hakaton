@@ -1,28 +1,33 @@
-import { SignedIn, SignInWithMetamaskButton } from '@clerk/nextjs'
+import { SignedIn, SignInButton, SignInWithMetamaskButton, UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import React from 'react'
 import { Button } from '../ui/button'
+import { DiamondPlus } from 'lucide-react'
 
 export const LandingNavbar = () => {
   return (
     <div className=''>
         <div className="w-[90%] mx-auto flex justify-between items-center py-2  ">
-            <Link href="">Home</Link>
-
-            <div>
-                <Link href={""}>About</Link>
-                <Link href={""}>FAQs</Link>
-                <Link href={""}>Contact</Link>
-            </div>
+            <Link href="" className='text-2xl font-semibold flex items-center gap-5'>
+                <div>
+                    <DiamondPlus />
+                </div>
+                <div>UniToken</div>
+            </Link>
 
             <div>
                 <SignedIn>
-                    <Button variant={'link'}>Go back to app</Button>
+                    <div>
+                        <Button variant={'link'}>Go back to app</Button>
+                        <UserButton />
+                    </div>
                 </SignedIn>
-                <SignInWithMetamaskButton>
+                <SignInButton>
                     <Button className="bg-white text-black">Sign In</Button>
-                </SignInWithMetamaskButton>
+                </SignInButton>
             </div>
+
+
         </div>
     </div>
   )
