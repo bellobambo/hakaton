@@ -125,7 +125,7 @@ function AuthUser() {
         </motion.div>
 
         <motion.div
-          className=" flex-col space-y-2 hidden"
+          className=" flex-col space-y-2 flex"
           variants={inputVariants}
           custom={2}
         >
@@ -140,7 +140,7 @@ function AuthUser() {
         </motion.div>
 
         <motion.div
-          className=" flex-col space-y-2 hidden"
+          className=" flex-col space-y-2 flex"
           variants={inputVariants}
           custom={3}
         >
