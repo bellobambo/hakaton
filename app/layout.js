@@ -8,7 +8,7 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import SignIn from "./Components/SignIn";
-
+import "@uploadthing/react/styles.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -23,9 +23,7 @@ export default function RootLayout({ children }) {
         <body className={inter.className}>
           {/* <SignIn /> */}
 
-          <div className="max-w-screen-2xl mx-auto">
-          {children}
-          </div>
+          <div className="max-w-screen-2xl mx-auto">{children}</div>
         </body>
       </html>
     </ClerkProvider>

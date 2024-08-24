@@ -1,20 +1,26 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
+// import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import Web3 from "web3";
 import Loader from "./Loader";
 import Background from "./Background";
-import { UploadButton } from "@uploadthing/react";
+import { UploadButton, UploadDropzone } from "@uploadthing/react";
+import { useRouter } from "next/navigation";
 
 function AuthUser() {
   const { user } = useUser();
+  const router = useRouter();
 
   const [matricNumber, setMatricNumber] = useState("");
   const [hashedAddress, setHashedAddress] = useState("");
   const [image, setImage] = useState("");
-  const [Name, setName] = useState("");
+  const [name, setName] = useState("");
   const [balance, setBalance] = useState("");
+  const [phone, setPhone] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleMatricNumberChange = async (e) => {
     const value = e.target.value;
@@ -78,123 +84,191 @@ function AuthUser() {
 
   const handleCreateId = async (e) => {
     e.preventDefault();
+
+    setLoading(true); // Start loading
+
+    const payload = {
+      Matric_Number: matricNumber,
+      Full_Name: name,
+      Passport: image,
+      Phone: phone,
+      Wallet: hashedAddress,
+    };
+
+    try {
+      const response = await fetch("/api/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Success:", result);
+
+        setTimeout(() => {
+          router.push("/card");
+        }, 1500);
+      } else {
+        console.error("Failed to create document:", await response.json());
+        setSuccess(false);
+      }
+    } catch (error) {
+      console.error("Error creating document:", error);
+      setSuccess(false);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <motion.div className="mt-[100px]" initial="hidden" animate="visible">
-      <Background />
-      <motion.div
-        className="flex justify-center items-center"
-        variants={textVariants}
-      >
-        Welcome, {user.firstName}!!!
-      </motion.div>
-      <motion.div
-        className="flex flex-col justify-center items-center space-y-4 mt-4"
-        variants={textVariants}
-      >
-        <p className="text-center text-[#7DD3FCB3]">
-          Fill The Form To Request For Your University ID
-        </p>
+    <motion.div className="mt-[100px] flex justify-center">
+      <div className="border-2 border-[#7DD3FCB3] p-6 rounded-lg max-w-4xl w-full">
+        <Background />
+        <motion.form
+          className="flex flex-col items-center"
+          initial="hidden"
+          animate="visible"
+          onSubmit={handleCreateId}
+        >
+          <motion.div
+            className="flex flex-col items-center"
+            variants={textVariants}
+          >
+            <p>Welcome, {user.firstName}!!!</p>
+            <p className="text-center text-[#7DD3FCB3]">
+              Fill The Form To Request For Your University ID
+            </p>
+          </motion.div>
 
-        <motion.div
-          className="flex flex-col space-y-2"
-          variants={inputVariants}
-          custom={0}
-        >
-          <label className="text-[#7DD3FCB3]">Matric Number</label>
-          <motion.input
-            className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black"
-            type="text"
-            value={matricNumber}
-            onChange={handleMatricNumberChange}
-            whileFocus={{ scale: 1.05 }}
-          />
-        </motion.div>
-        <motion.div
-          className="flex flex-col space-y-2"
-          variants={inputVariants}
-          custom={2}
-        >
-          <label className="text-[#7DD3FCB3]">Name</label>
-          <motion.input
-            className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black"
-            type="text"
-            whileFocus={{ scale: 1.05 }}
-          />
-        </motion.div>
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4"
+            variants={textVariants}
+          >
+            {/* Matric Number Input */}
+            <motion.div
+              className="flex flex-col space-y-2"
+              variants={inputVariants}
+              custom={0}
+            >
+              <label className="text-[#7DD3FCB3]">Matric Number</label>
+              <motion.input
+                className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black w-full max-w-xs"
+                type="text"
+                value={matricNumber}
+                onChange={handleMatricNumberChange}
+                whileFocus={{ scale: 1.05 }}
+              />
+            </motion.div>
 
-        <motion.div
-          className=" flex-col space-y-2 flex"
-          variants={inputVariants}
-          custom={2}
-        >
-          <label className="text-[#7DD3FCB3]">Wallet Address</label>
-          <motion.input
-            className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black"
-            value={hashedAddress}
-            readOnly
-            type="text"
-            whileFocus={{ scale: 1.05 }}
-          />
-        </motion.div>
+            {/* Name Input */}
+            <motion.div
+              className="flex flex-col space-y-2"
+              variants={inputVariants}
+              custom={2}
+            >
+              <label className="text-[#7DD3FCB3]">Name</label>
+              <motion.input
+                className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black w-full max-w-xs"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                whileFocus={{ scale: 1.05 }}
+              />
+            </motion.div>
 
-        <motion.div
-          className=" flex-col space-y-2 flex"
-          variants={inputVariants}
-          custom={3}
-        >
-          <label className="text-[#7DD3FCB3]">Balance</label>
-          <motion.input
-            className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black"
-            value={balance}
-            readOnly
-            type="text"
-            whileFocus={{ scale: 1.05 }}
-          />
-        </motion.div>
+            {/* Wallet Address Input */}
+            <motion.div
+              className="flex flex-col space-y-2"
+              variants={inputVariants}
+              custom={2}
+            >
+              <label className="text-[#7DD3FCB3]">Wallet Address</label>
+              <motion.input
+                className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black w-full max-w-xs"
+                value={hashedAddress}
+                readOnly
+                type="text"
+                whileFocus={{ scale: 1.05 }}
+              />
+            </motion.div>
 
-        <motion.div
-          className="flex flex-col space-y-2"
-          variants={inputVariants}
-          custom={4}
-        >
-          <label className="text-[#7DD3FCB3]">Image (passport photo)</label>
-          <UploadButton
-            endpoint="imageUploader"
-            onClientUploadComplete={(res) => {
-              console.log("Files: ", res);
-              if (res && Array.isArray(res) && res.length > 0) {
-                setImage(res[0].url);
-              }
-            }}
-            onUploadError={(error) => {
-              alert(`ERROR! ${error.message}`);
-            }}
-          />
-        </motion.div>
+            {/* Balance Input */}
+            <motion.div
+              className="flex flex-col space-y-2"
+              variants={inputVariants}
+              custom={3}
+            >
+              <label className="text-[#7DD3FCB3]">Balance</label>
+              <motion.input
+                className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black w-full max-w-xs"
+                value={balance}
+                readOnly
+                type="text"
+                whileFocus={{ scale: 1.05 }}
+              />
+            </motion.div>
 
-        <motion.div
-          className="flex flex-col space-y-2"
-          variants={inputVariants}
-          custom={5}
-        >
-          <label className="text-[#7DD3FCB3]">Signature</label>
-          <motion.input
-            className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black"
-            type="text"
-            whileFocus={{ scale: 1.05 }}
-          />
-        </motion.div>
+            {/* Phone Number Input */}
+            <motion.div
+              className="flex flex-col space-y-2"
+              variants={inputVariants}
+              custom={5}
+            >
+              <label className="text-[#7DD3FCB3]">Phone Number</label>
+              <motion.input
+                className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black w-full max-w-xs"
+                type="text"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                whileFocus={{ scale: 1.05 }}
+              />
+            </motion.div>
 
-        <motion.button
-          className="mt-6 px-4 py-2 bg-[#7DD3FCB3] text-white rounded-lg hover:bg-[#7dd3fc] transition-colors duration-300"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Submit
-        </motion.button>
-      </motion.div>
+            {/* Image Upload */}
+            <motion.div
+              className="flex flex-col space-y-2"
+              variants={inputVariants}
+              custom={4}
+            >
+              <label className="text-[#7DD3FCB3]">Image (passport photo)</label>
+              <UploadDropzone
+                className="bg-[#7DD3FCB3]"
+                endpoint="imageUploader"
+                onClientUploadComplete={(res) => {
+                  console.log("Files: ", res);
+                  if (res && Array.isArray(res) && res.length > 0) {
+                    setImage(res[0].url);
+                  }
+                }}
+                onUploadError={(error) => {
+                  alert(`ERROR! ${error.message}`);
+                }}
+              />
+            </motion.div>
+          </motion.div>
+
+          {/* Submit Button */}
+          <motion.button
+            className="mt-6 px-4 py-2 bg-[#7DD3FCB3] text-white rounded-lg hover:bg-[#7dd3fc] transition-colors duration-300 w-full max-w-xs"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            type="submit"
+            disabled={loading} // Disable the button while loading
+          >
+            {loading ? "Submitting..." : "Submit"}
+          </motion.button>
+
+          {/* Success Message */}
+          {success && !loading && (
+            <p className="text-[#7DD3FCB3] mt-4">
+              Submission Successful! Redirecting...
+            </p>
+          )}
+        </motion.form>
+      </div>
     </motion.div>
   );
 }
