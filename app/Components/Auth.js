@@ -124,21 +124,22 @@ function AuthUser() {
   };
 
   return (
-    <motion.div className="mt-[100px] flex justify-center">
-      <div className="border-2 border-[#7DD3FCB3] p-6 rounded-lg max-w-4xl w-full">
-        <Background />
+    <motion.div className=" flex justify-center py-10">
+      <div className=" p-6 rounded-lg max-w-4xl bg-glass">
+        {/* <Background /> */}
+        
         <motion.form
-          className="flex flex-col items-center"
+          className=""
           initial="hidden"
           animate="visible"
           onSubmit={handleCreateId}
         >
           <motion.div
-            className="flex flex-col items-center"
+            className=""
             variants={textVariants}
           >
-            <p>Welcome, {user.firstName}!!!</p>
-            <p className="text-center text-[#7DD3FCB3]">
+            <p className="text-xl font-medium mb-1.5">Welcome, {user.firstName}.</p>
+            <p className="text-white/60 mb-4 ">
               Fill The Form To Request For Your University ID
             </p>
           </motion.div>
@@ -153,9 +154,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={0}
             >
-              <label className="text-[#7DD3FCB3]">Matric Number</label>
+              <label className="text-purple-800">Matric Number</label>
               <motion.input
-                className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
                 type="text"
                 value={matricNumber}
                 onChange={handleMatricNumberChange}
@@ -169,9 +170,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={2}
             >
-              <label className="text-[#7DD3FCB3]">Name</label>
+              <label className="text-purple-800">Name</label>
               <motion.input
-                className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -185,9 +186,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={2}
             >
-              <label className="text-[#7DD3FCB3]">Wallet Address</label>
+              <label className="text-purple-800">Wallet Address</label>
               <motion.input
-                className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
                 value={hashedAddress}
                 readOnly
                 type="text"
@@ -201,9 +202,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={3}
             >
-              <label className="text-[#7DD3FCB3]">Balance</label>
+              <label className="text-purple-800">Balance</label>
               <motion.input
-                className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
                 value={balance}
                 readOnly
                 type="text"
@@ -217,9 +218,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={5}
             >
-              <label className="text-[#7DD3FCB3]">Phone Number</label>
+              <label className="text-purple-800">Phone Number</label>
               <motion.input
-                className="border-b-2 border-[#7DD3FCB3] focus:outline-none text-black w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
@@ -227,15 +228,17 @@ function AuthUser() {
               />
             </motion.div>
 
+            <div></div>
+
             {/* Image Upload */}
             <motion.div
               className="flex flex-col space-y-2"
               variants={inputVariants}
               custom={4}
             >
-              <label className="text-[#7DD3FCB3]">Image (passport photo)</label>
+              <label className="text-purple-800">Image (passport photo)</label>
               <UploadDropzone
-                className="bg-[#7DD3FCB3]"
+                className="bg-[#581c87] "
                 endpoint="imageUploader"
                 onClientUploadComplete={(res) => {
                   console.log("Files: ", res);
@@ -251,19 +254,21 @@ function AuthUser() {
           </motion.div>
 
           {/* Submit Button */}
-          <motion.button
-            className="mt-6 px-4 py-2 bg-[#7DD3FCB3] text-white rounded-lg hover:bg-[#7dd3fc] transition-colors duration-300 w-full max-w-xs"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            type="submit"
-            disabled={loading} // Disable the button while loading
-          >
-            {loading ? "Submitting..." : "Submit"}
-          </motion.button>
+          <div className="flex justify-end items-end">
+            <motion.button
+              className="mt-6 px-7 py-2 bg-purple-900 text-white rounded-md duration-300 font-medium text-center"
+              // whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              type="submit"
+              disabled={loading} // Disable the button while loading
+              >
+              {loading ? "Submitting..." : "Submit"}
+            </motion.button>
+          </div>
 
           {/* Success Message */}
           {success && !loading && (
-            <p className="text-[#7DD3FCB3] mt-4">
+            <p className="text-purple-800 mt-4">
               Submission Successful! Redirecting...
             </p>
           )}
