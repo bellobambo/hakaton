@@ -126,19 +126,18 @@ function AuthUser() {
   return (
     <motion.div className=" flex justify-center py-10">
       <div className=" p-6 rounded-lg max-w-4xl bg-glass">
-        {/* <Background /> */}
-        
+        <Background />
+
         <motion.form
           className=""
           initial="hidden"
           animate="visible"
           onSubmit={handleCreateId}
         >
-          <motion.div
-            className=""
-            variants={textVariants}
-          >
-            <p className="text-xl font-medium mb-1.5">Welcome, {user.firstName}.</p>
+          <motion.div className="" variants={textVariants}>
+            <p className="text-xl font-medium mb-1.5">
+              Welcome, {user.firstName}.
+            </p>
             <p className="text-white/60 mb-4 ">
               Fill The Form To Request For Your University ID
             </p>
@@ -261,7 +260,7 @@ function AuthUser() {
               whileTap={{ scale: 0.95 }}
               type="submit"
               disabled={loading} // Disable the button while loading
-              >
+            >
               {loading ? "Submitting..." : "Submit"}
             </motion.button>
           </div>
