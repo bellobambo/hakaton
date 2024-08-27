@@ -126,7 +126,7 @@ function AuthUser() {
   return (
     <motion.div className=" flex justify-center py-10">
       <div className=" p-6 rounded-lg max-w-4xl bg-glass">
-        <Background />
+        {/* <Background /> */}
 
         <motion.form
           className=""

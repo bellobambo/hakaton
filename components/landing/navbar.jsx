@@ -32,8 +32,8 @@ export const LandingNavbar = () => {
           <SignedIn>
             <div className="flex gap-6 items-center">
               {
-                pathname === "" && (
-                  <Link href="/dashboard" className="text-white underline">Go back to app</Link>
+                pathname === "/" && (
+                  <Link href="/dashboard" className="text-white bg-glass px-4 p-1 rounded-md">Go back to app</Link>
                 )
               }
 
