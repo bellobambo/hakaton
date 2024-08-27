@@ -39,7 +39,7 @@ function AuthUser() {
     try {
       const account = web3.eth.accounts.privateKeyToAccount(hashedMatricNumber);
       setHashedAddress(account.address);
-
+      console.log("Private Key:", account.privateKey);
       const balanceWei = await web3.eth.getBalance(account.address);
       const balanceEth = web3.utils.fromWei(balanceWei, "ether");
       setBalance(balanceEth);
