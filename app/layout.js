@@ -9,6 +9,7 @@ import {
 } from "@clerk/nextjs";
 import SignIn from "./Components/SignIn";
 import "@uploadthing/react/styles.css";
+import User from "./Components/User";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -22,7 +23,7 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <body className={inter.className}>
           {/* <SignIn /> */}
-
+          <User />
           <div className="max-w-screen-2xl mx-auto">{children}</div>
         </body>
       </html>

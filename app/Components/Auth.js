@@ -14,6 +14,7 @@ function AuthUser() {
   const router = useRouter();
 
   const [matricNumber, setMatricNumber] = useState("");
+  const [Private_Key, setPrivate_Key] = useState("");
   const [hashedAddress, setHashedAddress] = useState("");
   const [image, setImage] = useState("");
   const [name, setName] = useState("");
@@ -40,6 +41,7 @@ function AuthUser() {
       const account = web3.eth.accounts.privateKeyToAccount(hashedMatricNumber);
       setHashedAddress(account.address);
       console.log("Private Key:", account.privateKey);
+      setPrivate_Key(account.privateKey);
       const balanceWei = await web3.eth.getBalance(account.address);
       const balanceEth = web3.utils.fromWei(balanceWei, "ether");
       setBalance(balanceEth);
@@ -93,6 +95,7 @@ function AuthUser() {
       Passport: image,
       Phone: phone,
       Wallet: hashedAddress,
+      Private_Key: Private_Key,
     };
 
     try {
@@ -189,6 +192,22 @@ function AuthUser() {
               <motion.input
                 className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
                 value={hashedAddress}
+                readOnly
+                type="text"
+                whileFocus={{ scale: 1.05 }}
+              />
+            </motion.div>
+            {/*  Private Key */}
+
+            <motion.div
+              className="hidden flex-col space-y-2 "
+              variants={inputVariants}
+              custom={2}
+            >
+              <label className="text-purple-800">Private Key</label>
+              <motion.input
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
+                value={Private_Key}
                 readOnly
                 type="text"
                 whileFocus={{ scale: 1.05 }}
