@@ -128,8 +128,8 @@ function AuthUser() {
 
   return (
     <motion.div className=" flex justify-center py-10">
-      <div className=" p-6 rounded-lg max-w-4xl bg-glass">
-        {/* <Background /> */}
+      <div className=" p-6 rounded-lg max-w-4xl  bg-black">
+        <Background />
 
         <motion.form
           className=""
@@ -142,7 +142,7 @@ function AuthUser() {
               Welcome, {user.firstName}.
             </p>
             <p className="text-white/60 mb-4 ">
-              Fill The Form To Request For Your University ID
+              Request For Your University ID
             </p>
           </motion.div>
 

@@ -3,7 +3,7 @@ import Background from "./Background";
 
 const Loader = () => {
   return (
-    <div className="flex justify-center items-center mt-[300px]">
+    <div className="flex justify-center items-center mt-[100px] h-screen">
       <Background />
       <svg
         className="animate-spin h-8 w-8"

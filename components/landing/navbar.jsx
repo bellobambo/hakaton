@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   SignedIn,
   SignedOut,
@@ -13,7 +13,7 @@ import { DiamondPlus } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export const LandingNavbar = () => {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <div className="">
@@ -31,17 +31,11 @@ export const LandingNavbar = () => {
         <div>
           <SignedIn>
             <div className="flex gap-6 items-center">
-              {
-                pathname === "/" && (
-                  <Link href="/dashboard" className="text-white bg-glass px-4 p-1 rounded-md">Go back to app</Link>
-                )
-              }
-
-              <UserButton />
+              <UserButton showName className=" text-[70px] text-white" />
             </div>
           </SignedIn>
           <SignedOut>
-            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+            <SignInButton mode="modal" forceRedirectUrl="/details">
               <Button className="bg-white text-black hover:bg-gray-400">
                 Sign In
               </Button>

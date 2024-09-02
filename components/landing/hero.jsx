@@ -9,7 +9,7 @@ export const Hero = () => {
         <div className="flex-1">
           <h2 className="text-5xl font-semibold mb-3">
             Seamless Campus Experience: Identity, Payments, and Access - All in
-            One App.
+            One Software.
           </h2>
           <h6 className="text-xl font-medium mb-5">
             Your key to effortless shopping, secure identity verification, and
@@ -17,7 +17,7 @@ export const Hero = () => {
           </h6>
           <div>
             <SignedOut>
-              <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+              <SignInButton mode="modal" forceRedirectUrl="/details">
                 <Button className="border border-white text-white bg-black">
                   Get Started
                 </Button>
@@ -25,9 +25,7 @@ export const Hero = () => {
             </SignedOut>
           </div>
         </div>
-        <div className="flex-1">
-          
-        </div>
+        <div className="flex-1"></div>
       </div>
     </div>
   );

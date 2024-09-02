@@ -10,12 +10,25 @@ import ReactCardFlip from "react-card-flip";
 import { DiamondPlus } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import { useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
+import PayForm from "../Components/Pay";
 
 const Page = () => {
   const [fetchedData, setFetchedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFlipped, setIsFlipped] = useState(false);
   const reportRef = useRef();
+  const { user } = useUser();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user === undefined) return;
+
+    if (!user) {
+      router.push("/");
+    }
+  }, [user, router]);
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);
@@ -92,7 +105,7 @@ const Page = () => {
     let position = 0;
 
     const logo = new Image();
-    logo.src = { DiamondPlus };
+    logo.src = "/oaulogo.png";
     logo.onload = () => {
       const logoWidth = 70;
       const logoHeight = 30;
@@ -243,6 +256,8 @@ const Page = () => {
           <p>No data available.</p>
         )}
       </div>
+
+      {/* <PayForm /> */}
     </div>
   );
 };

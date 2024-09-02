@@ -6,16 +6,15 @@ import React, { useEffect } from "react";
 
 function User() {
   const { user } = useUser();
-
   const router = useRouter();
 
   useEffect(() => {
-    console.log(user, "current user");
-  }, [user]);
+    if (user === undefined) return;
 
-  if (!user) {
-    router.push("/");
-  }
+    if (!user) {
+      router.push("/");
+    }
+  }, [user, router]);
 
   return null;
 }

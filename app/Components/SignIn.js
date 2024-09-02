@@ -12,6 +12,7 @@ const SignIn = () => {
 
       <SignedIn>
         <UserButton
+          className=" text-[70px] text-white"
           showName
           appearance={{
             elements: {
