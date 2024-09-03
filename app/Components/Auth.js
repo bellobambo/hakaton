@@ -42,7 +42,7 @@ function AuthUser() {
       const balanceWei = await web3.eth.getBalance(account.address);
       const balanceEth = web3.utils.fromWei(balanceWei, "ether");
       setBalance(balanceEth);
-      console.log(balanceEth, "balance");
+      console.log(balanceEth, "balanceing");
     } catch (error) {
       console.error("Error fetching balance:", error);
       setHashedAddress("");
