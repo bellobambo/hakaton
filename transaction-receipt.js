@@ -6,7 +6,7 @@ const privateKey =
   "0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0";
 const sender = web3.eth.accounts.wallet.add(privateKey)[0];
 
-const receiverAddress = "0x846563eB0F4361DF21cb6039da5F4C48d3FDAbfE";
+const receiverAddress = "0x959FA1b65A150Fbf3f21f20409A362645d23d264";
 
 web3.eth
   .sendTransaction({

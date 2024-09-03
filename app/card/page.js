@@ -7,12 +7,12 @@ import QRCode from "react-qr-code";
 import Web3 from "web3";
 import { LandingNavbar } from "@/components/landing/navbar";
 import ReactCardFlip from "react-card-flip";
-import { DiamondPlus } from "lucide-react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
+import toast, { Toaster } from "react-hot-toast";
 
 const Page = () => {
   const [fetchedData, setFetchedData] = useState([]);
@@ -25,7 +25,9 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [walletAddress, setWalletAddress] = useState("");
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [lastWallet, setLastWallet] = useState("");
+  const [privateKey, setPrivateKey] = useState("");
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -56,7 +58,16 @@ const Page = () => {
         if (response.ok) {
           const data = await response.json();
           console.log("Fetched Data:", data);
+
           setFetchedData(data.data);
+
+          if (data.data.length > 0) {
+            const lastItem = data.data[data.data.length - 1];
+            console.log("Wallet of the last item:", lastItem.Wallet);
+            console.log("Private key of the last item:", lastItem.Private_Key);
+            setPrivateKey(lastItem.Private_Key);
+            setLastWallet(lastItem.Wallet);
+          }
         } else {
           console.error("Error fetching data:", response.statusText);
         }
@@ -73,41 +84,12 @@ const Page = () => {
   const latestData =
     fetchedData.length > 0 ? fetchedData[fetchedData.length - 1] : null;
 
-  const getBalance = async () => {
-    if (!latestData) {
-      console.log("No data available yet.");
-      return;
-    }
-
-    try {
-      const web3 = new Web3("http://127.0.0.1:8545/");
-      const receiverAddress = latestData.Wallet;
-
-      console.log("latest address", receiverAddress);
-
-      const balanceWei = await web3.eth.getBalance(receiverAddress);
-      const balanceEth = web3.utils.fromWei(balanceWei, "ether");
-      const balanceFormatted = Number(balanceEth).toFixed(4);
-
-      setBalance(balanceFormatted);
-      console.log(balanceFormatted, "ETH balance");
-    } catch (error) {
-      console.log("Error:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (fetchedData.length > 0) {
-      getBalance();
-    }
-  }, [fetchedData]);
-
   const web3 = new Web3("http://127.0.0.1:8545/");
 
   web3.eth
     .getChainId()
     .then((result) => {
-      console.log("Chain ID: " + result);
+      // console.log("Chain ID: " + result);
     })
     .catch((error) => {
       console.error(error);
@@ -178,40 +160,90 @@ const Page = () => {
     };
   };
 
-  const privateKey = fetchedData.Private_key;
-  const sender = fetchedData.Wallet;
-
   const handlePay = async (e) => {
     e.preventDefault();
 
     try {
+      const amountNumber = parseFloat(amount); // Convert string to number
+      if (isNaN(amountNumber)) {
+        throw new Error("Invalid amount");
+      }
+
+      const amountInWei = web3.utils.toWei(amountNumber.toString(), "ether");
+
+      const sender = web3.eth.accounts.wallet.add(privateKey)[0];
+
+      console.log(sender.address, "sender");
+
+      // Send transaction
       const transaction = await web3.eth.sendTransaction({
-        from: fetchedData.Wallet,
+        from: sender.address,
         to: walletAddress,
-        value: web3.utils.toWei(amount, "ether"),
+        value: amountInWei,
       });
+
+      console.log(lastWallet, "sender");
+      console.log(walletAddress, "reciver");
+      console.log(amountInWei, "amount");
 
       console.log("Transaction Hash:", transaction.transactionHash);
 
-      const receiverBalance = await web3.eth.getBalance(walletAddress);
-      const myBalance = await web3.eth.getBalance(fetchedData.Wallet);
-      console.log(myBalance, "My Balance");
-      console.log(
-        "Receiver Balance:",
-        web3.utils.fromWei(receiverBalance, "ether"),
-        "ETH"
-      );
+      // Fetch receiver balance
+      const receiverBalanceInWei = await web3.eth.getBalance(walletAddress);
+      const receiverBalance = web3.utils.fromWei(receiverBalanceInWei, "ether");
+      console.log("Receiver Balance:", receiverBalance, "ETH");
 
+      // Fetch sender balance (optional)
+      const senderBalanceInWei = await web3.eth.getBalance(lastWallet);
+      const senderBalance = web3.utils.fromWei(senderBalanceInWei, "ether");
+      console.log("Sender Balance:", senderBalance, "ETH");
+
+      toast.success("Transaction successful!");
+
+      // Reset form and close modal
       setAmount("");
       setWalletAddress("");
       setIsModalOpen(false);
     } catch (error) {
-      console.log("Error:", error);
+      console.log("Error:", error.message);
+
+      if (error.message.includes("Sender doesn't have enough funds")) {
+        const balanceMatch = error.message.match(/balance is: \d+/);
+        const balanceInfo = balanceMatch ? balanceMatch[0] : "";
+
+        const customMessage = `Sender doesn't have enough funds to send and the sender's ${balanceInfo}`;
+        toast.error(customMessage);
+      } else {
+        toast.error("An error occurred. Please try again.");
+      }
     }
   };
 
+  const FetchData = async () => {
+    if (lastWallet) {
+      console.log(lastWallet, "address");
+
+      const myBalance = await web3.eth
+        .getBalance(lastWallet)
+        .then((balanceInWei) => {
+          const balanceInEther = web3.utils.fromWei(balanceInWei, "ether");
+          return balanceInEther;
+        });
+
+      setBalance(myBalance);
+      console.log(myBalance, "My Balance");
+    }
+  };
+
+  useEffect(() => {
+    if (lastWallet) {
+      FetchData();
+    }
+  }, [lastWallet]);
+
   return (
     <div className="min-h-screen card-gradient ">
+      <Toaster position="top-right" reverseOrder={false} />
       <LandingNavbar />
 
       <div className="  flex items-center justify-center min-h-[70vh] ">
