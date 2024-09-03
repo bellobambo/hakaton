@@ -12,7 +12,7 @@ import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import PayForm from "../Components/Pay";
+import { motion, AnimatePresence } from "framer-motion";
 
 const Page = () => {
   const [fetchedData, setFetchedData] = useState([]);
@@ -21,6 +21,21 @@ const Page = () => {
   const reportRef = useRef();
   const { user } = useUser();
   const router = useRouter();
+  const [balance, setBalance] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const [walletAddress, setWalletAddress] = useState("");
+  const [amount, setAmount] = useState("");
+
+  const openModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setTimeout(() => {
+      setIsModalOpen(false);
+    }, 300);
+  };
 
   useEffect(() => {
     if (user === undefined) return;
@@ -59,26 +74,33 @@ const Page = () => {
     fetchedData.length > 0 ? fetchedData[fetchedData.length - 1] : null;
 
   const getBalance = async () => {
+    if (!latestData) {
+      console.log("No data available yet.");
+      return;
+    }
+
     try {
       const web3 = new Web3("http://127.0.0.1:8545/");
+      const receiverAddress = latestData.Wallet;
 
-      const receiverAddress = "0x4d7848f0f9aD56327aE9A0dff1AD6596EC9b83dF";
+      console.log("latest address", receiverAddress);
 
       const balanceWei = await web3.eth.getBalance(receiverAddress);
-
       const balanceEth = web3.utils.fromWei(balanceWei, "ether");
+      const balanceFormatted = Number(balanceEth).toFixed(4);
 
-      const balance = Number(balanceEth).toFixed(18);
-
-      console.log(balance, "ETH balance");
+      setBalance(balanceFormatted);
+      console.log(balanceFormatted, "ETH balance");
     } catch (error) {
       console.log("Error:", error);
     }
   };
 
   useEffect(() => {
-    getBalance();
-  }, []);
+    if (fetchedData.length > 0) {
+      getBalance();
+    }
+  }, [fetchedData]);
 
   const web3 = new Web3("http://127.0.0.1:8545/");
 
@@ -156,9 +178,42 @@ const Page = () => {
     };
   };
 
+  const privateKey = fetchedData.Private_key;
+  const sender = fetchedData.Wallet;
+
+  const handlePay = async (e) => {
+    e.preventDefault();
+
+    try {
+      const transaction = await web3.eth.sendTransaction({
+        from: fetchedData.Wallet,
+        to: walletAddress,
+        value: web3.utils.toWei(amount, "ether"),
+      });
+
+      console.log("Transaction Hash:", transaction.transactionHash);
+
+      const receiverBalance = await web3.eth.getBalance(walletAddress);
+      const myBalance = await web3.eth.getBalance(fetchedData.Wallet);
+      console.log(myBalance, "My Balance");
+      console.log(
+        "Receiver Balance:",
+        web3.utils.fromWei(receiverBalance, "ether"),
+        "ETH"
+      );
+
+      setAmount("");
+      setWalletAddress("");
+      setIsModalOpen(false);
+    } catch (error) {
+      console.log("Error:", error);
+    }
+  };
+
   return (
     <div className="min-h-screen card-gradient ">
       <LandingNavbar />
+
       <div className="  flex items-center justify-center min-h-[70vh] ">
         <Background />
         {loading ? (
@@ -169,7 +224,7 @@ const Page = () => {
               {/* Front Side of the Card */}
 
               <div className="items-center flex flex-col justify-center">
-                <div className="bg-glass  rounded-lg p-6 w-fit min-w-[300px] h-[350px] relative">
+                <div className="bg-black  rounded-lg p-6 w-fit min-w-[300px] h-[350px] relative">
                   <div className="flex justify-center mb-4">
                     {latestData.Passport && (
                       <img
@@ -204,7 +259,7 @@ const Page = () => {
 
               {/* Back Side of the Card */}
               <div className="items-center flex flex-col justify-center">
-                <div className="bg-glass  rounded-lg p-6 w-fit max-w-[300px] h-[350px] relative space-y-8">
+                <div className="bg-black  rounded-lg p-6 w-fit max-w-[300px] h-[350px] relative space-y-8">
                   <div
                     className="flex justify-center mb-20  bg-white p-1 w-fit items-center mx-auto"
                     ref={reportRef}
@@ -231,7 +286,7 @@ const Page = () => {
 
             <div className="flex justify-center items-center gap-6">
               <button
-                className="mt-4 px-4 py-2 bg-[#2e102e] text-purple rounded-md shadow-lg font-bold border-gray-500"
+                className="bg-[#471d47] border border-gray-500 text-white w-full md:w-auto h-[48px] mt-4 px-3 rounded"
                 onClick={handleFlip}
               >
                 Flip Card
@@ -241,6 +296,15 @@ const Page = () => {
                 onClick={downloadPDF}
               >
                 Save QRCode
+              </button>
+            </div>
+
+            <div className="flex justify-center items-center mt-4">
+              <button
+                className="bg-[#220c22] border border-gray-500 text-white w-full md:w-auto h-[48px] mt-4 px-8 mr-3 rounded"
+                onClick={openModal}
+              >
+                Pay
               </button>
             </div>
             <br />
@@ -257,7 +321,82 @@ const Page = () => {
         )}
       </div>
 
-      {/* <PayForm /> */}
+      <div className="flex justify-center items-center h-screen">
+        <button
+          className="px-4 py-2 bg-purple-900 text-white rounded hover:bg-purple-700 transition"
+          onClick={openModal}
+        >
+          Pay
+        </button>
+        <AnimatePresence>
+          {isModalOpen && (
+            <div
+              className="fixed inset-0 bg-gray-400 bg-opacity-40 flex justify-center items-center z-50"
+              onClick={closeModal}
+            >
+              <motion.div
+                className="bg-black p-6 rounded-lg shadow-lg max-w-md w-full"
+                initial={{ y: -100, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -100, opacity: 0 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h2 className="text-2xl font-bold mb-4">Pay</h2>
+                <p className="mb-4">Current Balance: {balance} ETH</p>
+                <small className="mb-8">
+                  Wallet Address {latestData.Wallet}
+                </small>
+                <form onSubmit={handlePay}>
+                  <div className="form-group my-8">
+                    <label
+                      htmlFor="walletAddress"
+                      className="block text-purple-700"
+                    >
+                      Receiver Wallet Address
+                    </label>
+                    <input
+                      type="text"
+                      id="walletAddress"
+                      className="mt-1 w-full p-2 border border-gray-300 rounded text-black"
+                      value={walletAddress}
+                      onChange={(e) => setWalletAddress(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group mb-4">
+                    <label htmlFor="amount" className="block text-purple-700">
+                      Amount
+                    </label>
+                    <input
+                      type="number"
+                      id="amount"
+                      className="mt-1 w-full p-2 border border-gray-300 rounded text-black"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full bg-purple-900 text-white py-2 rounded hover:bg-purple-700 transition"
+                  >
+                    Send
+                  </button>
+                </form>
+                <button
+                  onClick={closeModal}
+                  className="mt-4 w-full text-center text-purple-700 hover:underline border-2 p-2 no-underline"
+                >
+                  Cancel
+                </button>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };

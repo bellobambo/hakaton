@@ -1,6 +1,6 @@
 "use client";
 import { useUser } from "@clerk/nextjs";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 // import { useRouter } from "next/router";
 import { motion } from "framer-motion";
 import Web3 from "web3";
@@ -13,7 +13,7 @@ function AuthUser() {
   const { user } = useUser();
   const router = useRouter();
 
-  const [matricNumber, setMatricNumber] = useState("");
+  const [matricNumber, setMatricNumber] = useState("CSC/2022/097");
   const [Private_Key, setPrivate_Key] = useState("");
   const [hashedAddress, setHashedAddress] = useState("");
   const [image, setImage] = useState("");
@@ -23,10 +23,7 @@ function AuthUser() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleMatricNumberChange = async (e) => {
-    const value = e.target.value;
-    setMatricNumber(value);
-
+  const generateWalletFromMatricNumber = async (value) => {
     if (!value) {
       setHashedAddress("");
       setBalance("");
@@ -52,6 +49,10 @@ function AuthUser() {
       setBalance("");
     }
   };
+
+  useEffect(() => {
+    generateWalletFromMatricNumber(matricNumber);
+  }, [matricNumber]);
 
   const inputVariants = {
     hidden: { x: -100, opacity: 0 },
@@ -91,7 +92,7 @@ function AuthUser() {
 
     const payload = {
       Matric_Number: matricNumber,
-      Full_Name: name,
+      Full_Name: name || user.fullName,
       Passport: image,
       Phone: phone,
       Wallet: hashedAddress,
@@ -139,7 +140,7 @@ function AuthUser() {
         >
           <motion.div className="" variants={textVariants}>
             <p className="text-xl font-medium mb-1.5">
-              Welcome, {user.firstName}.
+              Welcome, {user.fullName}.
             </p>
             <p className="text-white/60 mb-4 ">
               Request For Your University ID
@@ -161,7 +162,8 @@ function AuthUser() {
                 className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
                 type="text"
                 value={matricNumber}
-                onChange={handleMatricNumberChange}
+                readOnly
+                onChange={(e) => setMatricNumber(e.target.value)}
                 whileFocus={{ scale: 1.05 }}
               />
             </motion.div>
@@ -176,7 +178,7 @@ function AuthUser() {
               <motion.input
                 className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
                 type="text"
-                value={name}
+                value={name || user.fullName || " "}
                 onChange={(e) => setName(e.target.value)}
                 whileFocus={{ scale: 1.05 }}
               />
