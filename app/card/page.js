@@ -18,13 +18,13 @@ const Page = () => {
   const [fetchedData, setFetchedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFlipped, setIsFlipped] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   const reportRef = useRef();
   const { user } = useUser();
   const router = useRouter();
   const [balance, setBalance] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [walletAddress, setWalletAddress] = useState("");
   const [amount, setAmount] = useState(0);
@@ -164,8 +164,8 @@ const Page = () => {
   };
 
   const handlePay = async (e) => {
-    e.preventDefault();
     setIsLoading(true);
+    e.preventDefault();
 
     try {
       const amountNumber = parseFloat(amount);
@@ -212,7 +212,7 @@ const Page = () => {
         toast.error("An error occurred. Please try again.");
       }
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Set loading state to false
     }
   };
 
@@ -412,10 +412,15 @@ const Page = () => {
                 <div className="flex justify-between">
                   <h2 className="text-2xl font-bold mb-4">Pay</h2>
                   <button
-                    className="px-3 bg-purple-900 text-white py-2 rounded hover:bg-purple-700 transition"
+                    className={`px-3 py-2 rounded transition ${
+                      isProcessing
+                        ? "bg-gray-500 cursor-not-allowed"
+                        : "bg-purple-900 hover:bg-purple-700"
+                    } text-white`}
                     onClick={sendTransaction}
+                    disabled={isProcessing}
                   >
-                    Get Free 5 ETH
+                    {isProcessing ? "Processing..." : "Get Free 5 ETH"}
                   </button>
                 </div>
                 <p className="mb-4">
@@ -446,7 +451,6 @@ const Page = () => {
                       value={walletAddress}
                       onChange={(e) => setWalletAddress(e.target.value)}
                       required
-                      disabled={isLoading}
                     />
                   </div>
 
@@ -461,19 +465,15 @@ const Page = () => {
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       required
-                      disabled={isLoading}
                     />
                   </div>
+
                   <button
                     type="submit"
-                    className={`w-full bg-purple-900 text-white py-2 rounded transition ${
-                      isLoading
-                        ? "opacity-50 cursor-not-allowed"
-                        : "hover:bg-purple-700"
-                    }`}
+                    className="w-full bg-purple-900 text-white py-2 rounded hover:bg-purple-700 transition"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Processing..." : "Send"}
+                    {isLoading ? "Loading..." : "Send"}
                   </button>
                 </form>
                 <button

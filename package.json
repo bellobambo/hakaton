@@ -6,6 +6,7 @@
     "dev": "concurrently \"next dev\" \"npx hardhat node\"",
     "build": "next build",
     "start": "next start",
+    "start:hardhat": "concurrently \"npx hardhat node\" \"next start\"",
     "lint": "next lint"
   },
   "dependencies": {
