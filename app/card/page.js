@@ -27,7 +27,7 @@ const Page = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [walletAddress, setWalletAddress] = useState("");
-  const [amount, setAmount] = useState(0);
+  const [amount, setAmount] = useState();
   const [lastWallet, setLastWallet] = useState("");
   const [privateKey, setPrivateKey] = useState("");
   const [newBalance, setNewBalance] = useState("");
@@ -244,7 +244,7 @@ const Page = () => {
         .sendTransaction({
           from: sender.address,
           to: receiverAddress,
-          value: web3.utils.toWei("5", "ether"),
+          value: web3.utils.toWei("1", "ether"),
         })
         .on("receipt", async (receipt) => {
           console.log("Receipt:", receipt);
@@ -412,7 +412,7 @@ const Page = () => {
                 <div className="flex justify-between">
                   <h2 className="text-2xl font-bold mb-4">Pay</h2>
                   <button
-                    className={`px-3 py-2 rounded transition ${
+                    className={`px-3 py-2 rounded transition  ${
                       isProcessing
                         ? "bg-gray-500 cursor-not-allowed"
                         : "bg-purple-900 hover:bg-purple-700"
@@ -420,17 +420,12 @@ const Page = () => {
                     onClick={sendTransaction}
                     disabled={isProcessing}
                   >
-                    {isProcessing ? "Processing..." : "Get Free 5 ETH"}
+                    {isProcessing ? "Processing..." : "Get Free 1 ETH"}
                   </button>
                 </div>
                 <p className="mb-4">
                   Current Balance:
-                  {newBalance
-                    ? newBalance
-                    : balance
-                    ? balance
-                    : "Loading..."}{" "}
-                  ETH
+                  {newBalance ? newBalance : balance ? balance : 0} ETH
                 </p>
 
                 <small className="mb-8">

@@ -155,9 +155,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={0}
             >
-              <label className="text-purple-800">Matric Number</label>
+              <label className="text-white/60">Matric Number</label>
               <motion.input
-                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
                 type="text"
                 value={matricNumber}
                 readOnly
@@ -172,9 +172,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={2}
             >
-              <label className="text-purple-800">Name</label>
+              <label className="text-white/60">Name</label>
               <motion.input
-                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
                 type="text"
                 value={name || user.fullName || " "}
                 onChange={(e) => setName(e.target.value)}
@@ -188,9 +188,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={2}
             >
-              <label className="text-purple-800">Wallet Address</label>
+              <label className="text-white/60">Wallet Address</label>
               <motion.input
-                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
                 value={hashedAddress}
                 readOnly
                 type="text"
@@ -204,9 +204,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={2}
             >
-              <label className="text-purple-800">Private Key</label>
+              <label className="text-white/60">Private Key</label>
               <motion.input
-                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
                 value={Private_Key}
                 readOnly
                 type="text"
@@ -220,9 +220,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={3}
             >
-              <label className="text-purple-800">Balance</label>
+              <label className="text-white/60">Balance</label>
               <motion.input
-                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
                 value={balance}
                 readOnly
                 type="text"
@@ -236,9 +236,9 @@ function AuthUser() {
               variants={inputVariants}
               custom={5}
             >
-              <label className="text-purple-800">Phone Number</label>
+              <label className="text-white/60">Phone Number</label>
               <motion.input
-                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-purple-800 w-full max-w-xs"
+                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
@@ -258,7 +258,7 @@ function AuthUser() {
               variants={inputVariants}
               custom={4}
             >
-              <label className="text-purple-800">Image (passport photo)</label>
+              <label className="text-white/60">Image (passport photo)</label>
               <UploadDropzone
                 className="bg-[#581c87] "
                 endpoint="imageUploader"
@@ -286,7 +286,7 @@ function AuthUser() {
 
           {/* Success Message */}
           {success && !loading && (
-            <p className="text-purple-800 mt-4">
+            <p className="text-white/60 mt-4">
               Submission Successful! Redirecting...
             </p>
           )}
