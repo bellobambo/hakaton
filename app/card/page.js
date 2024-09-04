@@ -18,6 +18,8 @@ const Page = () => {
   const [fetchedData, setFetchedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
   const reportRef = useRef();
   const { user } = useUser();
   const router = useRouter();
@@ -28,6 +30,7 @@ const Page = () => {
   const [amount, setAmount] = useState(0);
   const [lastWallet, setLastWallet] = useState("");
   const [privateKey, setPrivateKey] = useState("");
+  const [newBalance, setNewBalance] = useState("");
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -162,9 +165,10 @@ const Page = () => {
 
   const handlePay = async (e) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const amountNumber = parseFloat(amount); // Convert string to number
+      const amountNumber = parseFloat(amount);
       if (isNaN(amountNumber)) {
         throw new Error("Invalid amount");
       }
@@ -173,32 +177,23 @@ const Page = () => {
 
       const sender = web3.eth.accounts.wallet.add(privateKey)[0];
 
-      console.log(sender.address, "sender");
-
       // Send transaction
-      const transaction = await web3.eth.sendTransaction({
-        from: sender.address,
+      await web3.eth.sendTransaction({
+        from: lastWallet,
         to: walletAddress,
         value: amountInWei,
       });
 
-      console.log(lastWallet, "sender");
-      console.log(walletAddress, "reciver");
-      console.log(amountInWei, "amount");
-
-      console.log("Transaction Hash:", transaction.transactionHash);
-
-      // Fetch receiver balance
-      const receiverBalanceInWei = await web3.eth.getBalance(walletAddress);
-      const receiverBalance = web3.utils.fromWei(receiverBalanceInWei, "ether");
-      console.log("Receiver Balance:", receiverBalance, "ETH");
-
-      // Fetch sender balance (optional)
-      const senderBalanceInWei = await web3.eth.getBalance(lastWallet);
-      const senderBalance = web3.utils.fromWei(senderBalanceInWei, "ether");
-      console.log("Sender Balance:", senderBalance, "ETH");
+      // Fetch sender balance after transaction
+      const updatedBalanceInWei = await web3.eth.getBalance(lastWallet);
+      const updatedBalanceInEther = web3.utils.fromWei(
+        updatedBalanceInWei,
+        "ether"
+      );
+      setNewBalance(updatedBalanceInEther);
 
       toast.success("Transaction successful!");
+      console.log(updatedBalanceInEther, "new bal");
 
       // Reset form and close modal
       setAmount("");
@@ -216,6 +211,8 @@ const Page = () => {
       } else {
         toast.error("An error occurred. Please try again.");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -235,11 +232,49 @@ const Page = () => {
     }
   };
 
+  const privateKey2 =
+    "0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0";
+  const sender = web3.eth.accounts.wallet.add(privateKey2);
+  const receiverAddress = "0x959FA1b65A150Fbf3f21f20409A362645d23d264";
+
+  const sendTransaction = async () => {
+    setIsProcessing(true);
+    try {
+      await web3.eth
+        .sendTransaction({
+          from: sender.address,
+          to: receiverAddress,
+          value: web3.utils.toWei("5", "ether"),
+        })
+        .on("receipt", async (receipt) => {
+          console.log("Receipt:", receipt);
+
+          // Fetch the sender's updated balance after the transaction
+          const updatedBalanceInWei = await web3.eth.getBalance(lastWallet);
+          const updatedBalanceInEther = web3.utils.fromWei(
+            updatedBalanceInWei,
+            "ether"
+          );
+          console.log("Updated Sender Balance:", updatedBalanceInEther, "ETH");
+
+          // Update the balance state to reflect the new balance in the UI
+          setBalance(updatedBalanceInEther);
+        })
+        .on("error", (error) => {
+          console.error("Error:", error);
+        });
+    } catch (error) {
+      console.error("Transaction failed:", error);
+    } finally {
+      setIsProcessing(false); // Set processing state to false
+    }
+  };
+
   useEffect(() => {
     if (lastWallet) {
       FetchData();
     }
-  }, [lastWallet]);
+  }, [lastWallet, sendTransaction, balance]);
 
   return (
     <div className="min-h-screen card-gradient ">
@@ -374,8 +409,25 @@ const Page = () => {
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <h2 className="text-2xl font-bold mb-4">Pay</h2>
-                <p className="mb-4">Current Balance: {balance} ETH</p>
+                <div className="flex justify-between">
+                  <h2 className="text-2xl font-bold mb-4">Pay</h2>
+                  <button
+                    className="px-3 bg-purple-900 text-white py-2 rounded hover:bg-purple-700 transition"
+                    onClick={sendTransaction}
+                  >
+                    Get Free 5 ETH
+                  </button>
+                </div>
+                <p className="mb-4">
+                  Current Balance:
+                  {newBalance
+                    ? newBalance
+                    : balance
+                    ? balance
+                    : "Loading..."}{" "}
+                  ETH
+                </p>
+
                 <small className="mb-8">
                   Wallet Address {latestData.Wallet}
                 </small>
@@ -394,6 +446,7 @@ const Page = () => {
                       value={walletAddress}
                       onChange={(e) => setWalletAddress(e.target.value)}
                       required
+                      disabled={isLoading}
                     />
                   </div>
 
@@ -408,14 +461,19 @@ const Page = () => {
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
                       required
+                      disabled={isLoading}
                     />
                   </div>
-
                   <button
                     type="submit"
-                    className="w-full bg-purple-900 text-white py-2 rounded hover:bg-purple-700 transition"
+                    className={`w-full bg-purple-900 text-white py-2 rounded transition ${
+                      isLoading
+                        ? "opacity-50 cursor-not-allowed"
+                        : "hover:bg-purple-700"
+                    }`}
+                    disabled={isLoading}
                   >
-                    Send
+                    {isLoading ? "Processing..." : "Send"}
                   </button>
                 </form>
                 <button

@@ -10,6 +10,8 @@ import {
 import SignIn from "./Components/SignIn";
 import "@uploadthing/react/styles.css";
 import User from "./Components/User";
+import { dark, neobrutalism, shadesOfPurple } from "@clerk/themes";
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -19,7 +21,13 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}>
+    <ClerkProvider
+      appearance={{
+        baseTheme: shadesOfPurple,
+        signIn: { baseTheme: shadesOfPurple },
+      }}
+      frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}
+    >
       <html lang="en">
         <body className={inter.className}>
           {/* <SignIn /> */}

@@ -112,9 +112,7 @@ function AuthUser() {
         const result = await response.json();
         console.log("Success:", result);
 
-        setTimeout(() => {
-          router.push("/card");
-        }, 1500);
+        router.push("/card");
       } else {
         console.error("Failed to create document:", await response.json());
         setSuccess(false);
@@ -143,12 +141,12 @@ function AuthUser() {
               Welcome, {user.fullName}.
             </p>
             <p className="text-white/60 mb-4 ">
-              Request For Your University ID
+              Confirm Details To Request/Access Your University ID
             </p>
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4"
+            className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-4"
             variants={textVariants}
           >
             {/* Matric Number Input */}
@@ -218,7 +216,7 @@ function AuthUser() {
 
             {/* Balance Input */}
             <motion.div
-              className="flex flex-col space-y-2"
+              className="hidden flex-col space-y-2 "
               variants={inputVariants}
               custom={3}
             >
@@ -251,8 +249,12 @@ function AuthUser() {
             <div></div>
 
             {/* Image Upload */}
+          </motion.div>
+
+          {/* Submit Button */}
+          <div className="flex justify-between items-center flex-col">
             <motion.div
-              className="flex flex-col space-y-2"
+              className="flex flex-col space-y-2 justify-start"
               variants={inputVariants}
               custom={4}
             >
@@ -271,10 +273,6 @@ function AuthUser() {
                 }}
               />
             </motion.div>
-          </motion.div>
-
-          {/* Submit Button */}
-          <div className="flex justify-end items-end">
             <motion.button
               className="mt-6 px-7 py-2 bg-purple-900 text-white rounded-md duration-300 font-medium text-center"
               // whileHover={{ scale: 1.1 }}

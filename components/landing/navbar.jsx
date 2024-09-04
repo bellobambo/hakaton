@@ -11,6 +11,7 @@ import React from "react";
 import { Button } from "../ui/button";
 import { DiamondPlus } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { dark, neobrutalism, shadesOfPurple } from "@clerk/themes";
 
 export const LandingNavbar = () => {
   const pathname = usePathname();
@@ -31,7 +32,13 @@ export const LandingNavbar = () => {
         <div>
           <SignedIn>
             <div className="flex gap-6 items-center">
-              <UserButton showName className=" text-[70px] text-white" />
+              <UserButton
+                showName
+                appearance={{
+                  baseTheme: shadesOfPurple,
+                }}
+                className="text-[70px] text-white"
+              />
             </div>
           </SignedIn>
           <SignedOut>
