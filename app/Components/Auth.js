@@ -278,7 +278,7 @@ function AuthUser() {
               // whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               type="submit"
-              disabled={loading} // Disable the button while loading
+              disabled={loading}
             >
               {loading ? "Submitting..." : "Submit"}
             </motion.button>

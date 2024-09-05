@@ -412,7 +412,7 @@ const Page = () => {
                 <div className="flex justify-between">
                   <h2 className="text-2xl font-bold mb-4">Pay</h2>
                   <button
-                    className={`px-3 py-2 rounded transition  ${
+                    className={`px-3 py-2 rounded transition  invisible ${
                       isProcessing
                         ? "bg-gray-500 cursor-not-allowed"
                         : "bg-purple-900 hover:bg-purple-700"
