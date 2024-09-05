@@ -2,7 +2,7 @@
 <p>
   Unitoken is a unified Campus ID card system designed to streamline access across all facilities within an institution,
   eliminating the need for multiple ID cards. Additionally, it integrates with blockchain technology Using Web3js,
-  enabling seamless transactions between different wallets.
+  enabling seamless transactions between different wallets on campus.
 </p>
 
 <p> Unitoken Combines all your university ID card- library, hostel, ICT, clinic - into One.
