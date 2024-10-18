@@ -11,6 +11,7 @@ import SignIn from "./Components/SignIn";
 import "@uploadthing/react/styles.css";
 import User from "./Components/User";
 import { dark, neobrutalism, shadesOfPurple } from "@clerk/themes";
+import Providers from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,7 +33,10 @@ export default function RootLayout({ children }) {
         <body className={inter.className}>
           {/* <SignIn /> */}
           <User />
-          <div className="max-w-screen-2xl mx-auto">{children}</div>
+
+          <div className="max-w-screen-2xl mx-auto">
+            <Providers>{children}</Providers>
+          </div>
         </body>
       </html>
     </ClerkProvider>

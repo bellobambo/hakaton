@@ -1,8 +1,15 @@
-import { SignedOut, SignInButton } from "@clerk/nextjs";
+"use client";
+
 import React from "react";
 import { Button } from "../ui/button";
+import { useAccount, useConnect } from "wagmi";
+import CoinbaseButton from "@/app/Components/CoinbaseButton";
+// import CoinbaseButton from "./Components/CoinbaseButton"; // import CoinbaseButton
 
 export const Hero = () => {
+  const { address, isConnected } = useAccount();
+  const { connectors } = useConnect();
+
   return (
     <div>
       <div className="mx-auto w-[90%] py-16 flex flex-col-reverse lg:flex-row gap-10 ">
@@ -15,14 +22,22 @@ export const Hero = () => {
             Your key to effortless shopping, secure identity verification, and
             hassle-free campus activities.
           </h6>
+
           <div>
-            <SignedOut>
-              <SignInButton mode="modal" forceRedirectUrl="/details">
-                <Button className="border border-white text-white bg-black">
-                  Get Started
-                </Button>
-              </SignInButton>
-            </SignedOut>
+            {isConnected ? (
+              <div>
+                <p>Connected with address: {address}</p>
+              </div>
+            ) : (
+              <div>
+                <h2>Connect to Coinbase Wallet</h2>
+                {connectors
+                  .filter((connector) => connector.name === "Coinbase Wallet")
+                  .map((connector, index) => (
+                    <CoinbaseButton key={index} connector={connector} />
+                  ))}
+              </div>
+            )}
           </div>
         </div>
         <div className="flex-1"></div>
@@ -30,3 +45,5 @@ export const Hero = () => {
     </div>
   );
 };
+
+export default Hero;
