@@ -13,6 +13,10 @@ import { useRouter } from "next/navigation";
 // import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
+import { useCallsStatus, useWriteContracts } from "wagmi/experimental";
+import { useAccount, useConnect } from "wagmi";
+import TransactionStatus from "../Components/TransactionStatus";
+import NFTAbi from "@/abi/NFT";
 
 const Page = () => {
   const [fetchedData, setFetchedData] = useState([]);
@@ -28,9 +32,7 @@ const Page = () => {
 
   const [walletAddress, setWalletAddress] = useState("");
   const [amount, setAmount] = useState();
-  const [lastWallet, setLastWallet] = useState("");
-  const [privateKey, setPrivateKey] = useState("");
-  const [newBalance, setNewBalance] = useState("");
+
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -63,14 +65,8 @@ const Page = () => {
           console.log("Fetched Data:", data);
 
           setFetchedData(data.data);
+          console.log(data.data, "data")
 
-          if (data.data.length > 0) {
-            const lastItem = data.data[data.data.length - 1];
-            console.log("Wallet of the last item:", lastItem.Wallet);
-            console.log("Private key of the last item:", lastItem.Private_Key);
-            setPrivateKey(lastItem.Private_Key);
-            setLastWallet(lastItem.Wallet);
-          }
         } else {
           console.error("Error fetching data:", response.statusText);
         }
@@ -84,19 +80,15 @@ const Page = () => {
     handleData();
   }, []);
 
-  const latestData =
-    fetchedData.length > 0 ? fetchedData[fetchedData.length - 1] : null;
 
-  const web3 = new Web3("http://127.0.0.1:8545/");
+  const [latestData, setLatestData] = useState({
+    Full_Name: "Yinka",
+    Matric_Number: "CSC/2022/097",
+    Passport: "",
+    Phone: "09222223",
+    Wallet: "0x3D39D68D2B2fBd98C40a228d56F5205218B9a33D",
+  });
 
-  web3.eth
-    .getChainId()
-    .then((result) => {
-      // console.log("Chain ID: " + result);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
 
   const downloadPDF = async () => {
     const canvas = await html2canvas(reportRef.current, {
@@ -167,121 +159,71 @@ const Page = () => {
     setIsLoading(true);
     e.preventDefault();
 
-    try {
-      const amountNumber = parseFloat(amount);
-      if (isNaN(amountNumber)) {
-        throw new Error("Invalid amount");
-      }
+   
+  };
 
-      const amountInWei = web3.utils.toWei(amountNumber.toString(), "ether");
 
-      const sender = web3.eth.accounts.wallet.add(privateKey)[0];
+  const account = useAccount();
+  const { connectors, status } = useConnect();
 
-      // Send transaction
-      await web3.eth.sendTransaction({
-        from: lastWallet,
-        to: walletAddress,
-        value: amountInWei,
+  const { address, isConnected } = useAccount();
+  const {
+      writeContractsAsync,
+      error: mintError,
+      status: mintStatus,
+      data: id,
+  } = useWriteContracts();
+
+  const { data: callsStatus } = useCallsStatus({
+    id: id,
+    query: {
+        enabled: !!id,
+        // Poll every second until the calls are confirmed
+        refetchInterval: (data) =>
+            data.state.data?.status === "CONFIRMED" ? false : 1000,
+    },
+});
+
+async function mint() {
+  try {
+      await writeContractsAsync({
+          contracts: [
+              {
+                  address: "0xA2bCe1b3a30Bb9f29092a3501b19FD9E55D36622",
+                  abi: NFTAbi,
+                  args: [
+                      address,
+                      BigInt(0), // tokenId
+                      BigInt(1), // quantity
+                      "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", // currency
+                      BigInt(0), // pricePerToken
+                      {
+                          proof: [],
+                          quantityLimitPerWallet: BigInt(
+                              "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+                          ),
+                          pricePerToken: BigInt(0),
+                          currency:
+                              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+                      },
+                      `0x`, // data
+                  ],
+                  functionName: "claim",
+              },
+          ],
       });
+  } catch (error) {
+      console.error(error);
+  }
+}
 
-      // Fetch sender balance after transaction
-      const updatedBalanceInWei = await web3.eth.getBalance(lastWallet);
-      const updatedBalanceInEther = web3.utils.fromWei(
-        updatedBalanceInWei,
-        "ether"
-      );
-      setNewBalance(updatedBalanceInEther);
-
-      toast.success("Transaction successful!");
-      console.log(updatedBalanceInEther, "new bal");
-
-      // Reset form and close modal
-      setAmount("");
-      setWalletAddress("");
-      setIsModalOpen(false);
-    } catch (error) {
-      console.log("Error:", error.message);
-
-      if (error.message.includes("Sender doesn't have enough funds")) {
-        const balanceMatch = error.message.match(/balance is: \d+/);
-        const balanceInfo = balanceMatch ? balanceMatch[0] : "";
-
-        const customMessage = `Sender doesn't have enough funds to send and the sender's ${balanceInfo}`;
-        toast.error(customMessage);
-      } else {
-        toast.error("An error occurred. Please try again.");
-      }
-    } finally {
-      setIsLoading(false); // Set loading state to false
-    }
-  };
-
-  const FetchData = async () => {
-    if (lastWallet) {
-      console.log(lastWallet, "address");
-
-      const myBalance = await web3.eth
-        .getBalance(lastWallet)
-        .then((balanceInWei) => {
-          const balanceInEther = web3.utils.fromWei(balanceInWei, "ether");
-          return balanceInEther;
-        });
-
-      setBalance(myBalance);
-      console.log(myBalance, "My Balance");
-    }
-  };
-
-  const privateKey2 =
-    "0xde9be858da4a475276426320d5e9262ecfc3ba460bfac56360bfa6c4c28b4ee0";
-  const sender = web3.eth.accounts.wallet.add(privateKey2);
-  const receiverAddress = "0x959FA1b65A150Fbf3f21f20409A362645d23d264";
-
-  const sendTransaction = async () => {
-    setIsProcessing(true);
-    try {
-      await web3.eth
-        .sendTransaction({
-          from: sender.address,
-          to: receiverAddress,
-          value: web3.utils.toWei("1", "ether"),
-        })
-        .on("receipt", async (receipt) => {
-          console.log("Receipt:", receipt);
-
-          // Fetch the sender's updated balance after the transaction
-          const updatedBalanceInWei = await web3.eth.getBalance(lastWallet);
-          const updatedBalanceInEther = web3.utils.fromWei(
-            updatedBalanceInWei,
-            "ether"
-          );
-          console.log("Updated Sender Balance:", updatedBalanceInEther, "ETH");
-
-          // Update the balance state to reflect the new balance in the UI
-          setBalance(updatedBalanceInEther);
-        })
-        .on("error", (error) => {
-          console.error("Error:", error);
-        });
-    } catch (error) {
-      console.error("Transaction failed:", error);
-    } finally {
-      setIsProcessing(false); // Set processing state to false
-    }
-  };
-
-  useEffect(() => {
-    if (lastWallet) {
-      FetchData();
-    }
-  }, [lastWallet, sendTransaction, balance]);
 
   return (
     <div className="min-h-screen card-gradient ">
       <Toaster position="top-right" reverseOrder={false} />
       <LandingNavbar />
 
-      <div className="  flex items-center justify-center min-h-[70vh] ">
+      <div className="  flex items-center justify-center min-h-[70vh]   ">
         <Background />
         {loading ? (
           <Loader />
@@ -377,7 +319,7 @@ const Page = () => {
             <br />
 
             <small>
-              <i>
+              <i className="text-white">
                 The QR code will be used to confirm your identity in the
                 school's ICT Center
               </i>
@@ -389,12 +331,12 @@ const Page = () => {
       </div>
 
       <div className="flex justify-center items-center h-screen">
-        <button
+        {/* <button
           className="px-4 py-2 bg-purple-900 text-white rounded hover:bg-purple-700 transition"
           onClick={openModal}
         >
           Pay
-        </button>
+        </button> */}
         <AnimatePresence>
           {isModalOpen && (
             <div
@@ -402,31 +344,24 @@ const Page = () => {
               onClick={closeModal}
             >
               <motion.div
-                className="bg-black p-6 rounded-lg shadow-lg max-w-md w-full"
+                className="bg-black p-6 rounded-lg shadow-lg max-w-[500px] w-full "
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -100, opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex justify-between">
-                  <h2 className="text-2xl font-bold mb-4">Pay</h2>
-                  <button
-                    className={`px-3 py-2 rounded transition  invisible ${
-                      isProcessing
-                        ? "bg-gray-500 cursor-not-allowed"
-                        : "bg-purple-900 hover:bg-purple-700"
-                    } text-white`}
-                    onClick={sendTransaction}
-                    disabled={isProcessing}
-                  >
-                    {isProcessing ? "Processing..." : "Get Free 1 ETH"}
-                  </button>
+                <div className="text-white">
+                <h2>Account</h2>
+
+                <div>
+                    status: {account.status}
+                    <br />
+                    addresses: {JSON.stringify(account.addresses)}
+                    <br />
+                    chainId: {account.chainId}
                 </div>
-                <p className="mb-4">
-                  Current Balance:
-                  {newBalance ? newBalance : balance ? balance : 0} ETH
-                </p>
+            </div>
 
                 <small className="mb-8">
                   Wallet Address {latestData.Wallet}
@@ -462,14 +397,17 @@ const Page = () => {
                       required
                     />
                   </div>
-
-                  <button
-                    type="submit"
-                    className="w-full bg-purple-900 text-white py-2 rounded hover:bg-purple-700 transition"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? "Loading..." : "Send"}
-                  </button>
+                  {isConnected ? (
+                <div className="text-white">
+                    <h2>Mint</h2>
+                    <span onClick={mint} isLoading={mintStatus === "pending"}>
+                        {mintStatus === "pending" ? "Loading..." : "Mint"}
+                    </span>
+                    <div>writeContracts Status: {mintStatus}</div>
+                    <div>{mintError?.message}</div>
+                    <TransactionStatus callStatus={callsStatus} />
+                </div>
+            ) : null}
                 </form>
                 <button
                   onClick={closeModal}

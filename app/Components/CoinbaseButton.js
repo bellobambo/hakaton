@@ -4,7 +4,7 @@ import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { useRouter } from "next/navigation";
 
 const buttonStyles = {
-  background: "#0052FF",
+  background: "#4c1d95",
   border: "none",
   display: "flex",
   alignItems: "center",
