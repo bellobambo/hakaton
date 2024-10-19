@@ -13,7 +13,7 @@ const buttonStyles = {
   fontWeight: "bold",
   fontSize: "16px",
   color: "#fff",
-  padding: "10px 24px",
+  padding: "6px 12px",
   borderRadius: "8px",
   cursor: "pointer",
   transition: "background 0.3s",
@@ -29,6 +29,7 @@ const connectedContainerStyles = {
   color: "#333",
   fontSize: "16px",
   marginTop: "10px",
+  gap: "10px",
 };
 
 const copyButtonStyles = {
@@ -73,16 +74,16 @@ export default function CoinbaseButton() {
       <>
         <div style={connectedContainerStyles}>
           <p>
-            Connected with address: {address.slice(0, 6)}...{address.slice(-4)}
+            {address.slice(0, 6)}...{address.slice(-4)}
           </p>
           <button style={copyButtonStyles} onClick={copyToClipboard}>
             {copySuccess ? copySuccess : "Copy Address"}
           </button>
+          <button style={buttonStyles} onClick={handleDisconnect}>
+            <CoinbaseWalletLogo />
+            <span style={{ marginLeft: "10px" }}>Disconnect</span>
+          </button>
         </div>
-        {/* <button style={buttonStyles} onClick={handleDisconnect}>
-          <CoinbaseWalletLogo />
-          <span style={{ marginLeft: "10px" }}>Disconnect</span>
-        </button> */}
       </>
     );
 

@@ -4,19 +4,14 @@ import React, { useEffect, useState, useRef } from "react";
 import Background from "../Components/Background";
 import Loader from "../Components/Loader";
 import QRCode from "react-qr-code";
-import Web3 from "web3";
 import { LandingNavbar } from "@/components/landing/navbar";
 import ReactCardFlip from "react-card-flip";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRouter } from "next/navigation";
-// import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
-import { useCallsStatus, useWriteContracts } from "wagmi/experimental";
 import { useAccount, useConnect } from "wagmi";
-import TransactionStatus from "../Components/TransactionStatus";
-import NFTAbi from "@/abi/NFT";
 import { useSendTransaction, useWaitForTransactionReceipt } from "wagmi";
 import { parseEther } from "viem";
 
@@ -33,13 +28,8 @@ const Page = () => {
   const reportRef = useRef();
   // const { user } = useUser();
   const router = useRouter();
-  const [balance, setBalance] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const [walletAddress, setWalletAddress] = useState("");
-  const [amount, setAmount] = useState();
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -63,6 +53,14 @@ const Page = () => {
     setIsFlipped(!isFlipped);
   };
 
+  const [latestData, setLatestData] = useState({
+    Full_Name: "Yinka",
+    Matric_Number: "CSC/2022/097",
+    Passport: "",
+    Phone: "09222223",
+    Wallet: "0x3D39D68D2B2fBd98C40a228d56F5205218B9a33D",
+  });
+
   useEffect(() => {
     const handleData = async () => {
       try {
@@ -72,7 +70,17 @@ const Page = () => {
           console.log("Fetched Data:", data);
 
           setFetchedData(data.data);
-          console.log(data.data, "data");
+
+          const lastUser = data.data[data.data.length - 1]; // Get last user data
+          if (lastUser) {
+            setLatestData({
+              Full_Name: lastUser.Full_Name,
+              Matric_Number: lastUser.Matric_Number,
+              Passport: lastUser.Passport,
+              Phone: lastUser.Phone,
+              Wallet: lastUser.Wallet,
+            });
+          }
         } else {
           console.error("Error fetching data:", response.statusText);
         }
@@ -85,14 +93,6 @@ const Page = () => {
 
     handleData();
   }, []);
-
-  const [latestData, setLatestData] = useState({
-    Full_Name: "Yinka",
-    Matric_Number: "CSC/2022/097",
-    Passport: "",
-    Phone: "09222223",
-    Wallet: "0x3D39D68D2B2fBd98C40a228d56F5205218B9a33D",
-  });
 
   const downloadPDF = async () => {
     const canvas = await html2canvas(reportRef.current, {
@@ -159,72 +159,16 @@ const Page = () => {
     };
   };
 
-  const handlePay = async (e) => {
-    setIsLoading(true);
-    e.preventDefault();
-  };
-
   const account = useAccount();
-  const { connectors, status } = useConnect();
 
   const { address, isConnected } = useAccount();
-  const {
-    writeContractsAsync,
-    error: mintError,
-    status: mintStatus,
-    data: id,
-  } = useWriteContracts();
-
-  const { data: callsStatus } = useCallsStatus({
-    id: id,
-    query: {
-      enabled: !!id,
-      // Poll every second until the calls are confirmed
-      refetchInterval: (data) =>
-        data.state.data?.status === "CONFIRMED" ? false : 1000,
-    },
-  });
-
-  async function mint() {
-    try {
-      await writeContractsAsync({
-        contracts: [
-          {
-            address: "0xA2bCe1b3a30Bb9f29092a3501b19FD9E55D36622",
-            abi: NFTAbi,
-            args: [
-              address,
-              BigInt(0), // tokenId
-              BigInt(1), // quantity
-              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", // currency
-              BigInt(0), // pricePerToken
-              {
-                proof: [],
-                quantityLimitPerWallet: BigInt(
-                  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-                ),
-                pricePerToken: BigInt(0),
-                currency: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-              },
-              `0x`, // data
-            ],
-            functionName: "claim",
-          },
-        ],
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   async function submit(e) {
     e.preventDefault();
-
     const formData = new FormData(e.target);
-    const to = formData.get("address"); // Assuming the 'address' input value is correctly formatted.
+    const to = formData.get("address");
     const value = formData.get("value");
-
-    sendTransaction({ to, value: ethers.utils.parseEther(value) });
+    sendTransaction({ to, value: parseEther(value) });
   }
 
   const { isLoading: isConfirming, isSuccess: isConfirmed } =
@@ -370,10 +314,10 @@ const Page = () => {
 
                   <div>
                     status: {account.status}
-                    <br />
+                    {/* <br />
                     addresses: {JSON.stringify(account.addresses)}
                     <br />
-                    chainId: {account.chainId}
+                    chainId: {account.chainId} */}
                   </div>
                 </div>
 
@@ -388,7 +332,6 @@ const Page = () => {
                     >
                       Receiver Wallet Address
                     </label>
-
                     <input
                       type="text"
                       className="mt-1 w-full p-2 border border-gray-300 rounded text-black"
@@ -407,10 +350,11 @@ const Page = () => {
                       className="mt-1 w-full p-2 border border-gray-300 rounded text-black"
                       name="value"
                       placeholder="0.05"
-                      required
+                      step="any" // Allows decimal input
                       required
                     />
                   </div>
+
                   {isConnected ? (
                     <div className="text-white">
                       <button

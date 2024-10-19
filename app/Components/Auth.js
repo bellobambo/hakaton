@@ -14,7 +14,7 @@ function AuthUser() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
 
-  const [matricNumber, setMatricNumber] = useState("CSC/2022/097");
+  const [matricNumber, setMatricNumber] = useState("");
   const [image, setImage] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -118,7 +118,6 @@ function AuthUser() {
                 className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
                 type="text"
                 value={matricNumber}
-                readOnly
                 onChange={(e) => setMatricNumber(e.target.value)}
                 whileFocus={{ scale: 1.05 }}
               />
