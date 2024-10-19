@@ -8,52 +8,18 @@ import Loader from "./Loader";
 import Background from "./Background";
 import { UploadButton, UploadDropzone } from "@uploadthing/react";
 import { useRouter } from "next/navigation";
-import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { useAccount } from "wagmi";
 
 function AuthUser() {
   const router = useRouter();
   const { address, isConnected } = useAccount();
 
   const [matricNumber, setMatricNumber] = useState("CSC/2022/097");
-  const [Private_Key, setPrivate_Key] = useState("");
-  const [hashedAddress, setHashedAddress] = useState("");
   const [image, setImage] = useState("");
   const [name, setName] = useState("");
-  const [balance, setBalance] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-
-  const generateWalletFromMatricNumber = async (value) => {
-    if (!value) {
-      setHashedAddress("");
-      setBalance("");
-      return;
-    }
-
-    const web3 = new Web3();
-    const hashedMatricNumber = web3.utils.sha3(value);
-    console.log(hashedMatricNumber, "hashed matric number");
-
-    try {
-      const account = web3.eth.accounts.privateKeyToAccount(hashedMatricNumber);
-      setHashedAddress(account.address);
-      console.log("Private Key:", account.privateKey);
-      setPrivate_Key(account.privateKey);
-      const balanceWei = await web3.eth.getBalance(account.address);
-      const balanceEth = web3.utils.fromWei(balanceWei, "ether");
-      setBalance(balanceEth);
-      console.log(balanceEth, "balanceing");
-    } catch (error) {
-      console.error("Error fetching balance:", error);
-      setHashedAddress("");
-      setBalance("");
-    }
-  };
-
-  useEffect(() => {
-    generateWalletFromMatricNumber(matricNumber);
-  }, [matricNumber]);
 
   const inputVariants = {
     hidden: { x: -100, opacity: 0 },
@@ -85,11 +51,10 @@ function AuthUser() {
 
     const payload = {
       Matric_Number: matricNumber,
-      Full_Name: name || user.fullName,
+      Full_Name: name,
       Passport: image,
       Phone: phone,
-      Wallet: hashedAddress,
-      Private_Key: Private_Key,
+      Wallet: address,
     };
 
     try {
@@ -185,38 +150,6 @@ function AuthUser() {
               <motion.input
                 className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
                 value={address}
-                readOnly
-                type="text"
-                whileFocus={{ scale: 1.05 }}
-              />
-            </motion.div>
-            {/*  Private Key */}
-
-            <motion.div
-              className="hidden flex-col space-y-2 "
-              variants={inputVariants}
-              custom={2}
-            >
-              <label className="text-white/60">Private Key</label>
-              <motion.input
-                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
-                value={Private_Key}
-                readOnly
-                type="text"
-                whileFocus={{ scale: 1.05 }}
-              />
-            </motion.div>
-
-            {/* Balance Input */}
-            <motion.div
-              className="hidden flex-col space-y-2 "
-              variants={inputVariants}
-              custom={3}
-            >
-              <label className="text-white/60">Balance</label>
-              <motion.input
-                className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
-                value={balance}
                 readOnly
                 type="text"
                 whileFocus={{ scale: 1.05 }}

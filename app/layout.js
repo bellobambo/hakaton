@@ -21,13 +21,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <ClerkProvider
-      appearance={{
-        baseTheme: shadesOfPurple,
-        signIn: { baseTheme: shadesOfPurple },
-      }}
-      frontendApi={process.env.NEXT_PUBLIC_CLERK_FRONTEND_API}
-    >
+
       <html lang="en">
         <body className={inter.className}>
           {/* <SignIn /> */}
@@ -37,6 +31,6 @@ export default function RootLayout({ children }) {
           </div>
         </body>
       </html>
-    </ClerkProvider>
+    
   );
 }
