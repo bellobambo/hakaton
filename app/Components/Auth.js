@@ -8,9 +8,11 @@ import Loader from "./Loader";
 import Background from "./Background";
 import { UploadButton, UploadDropzone } from "@uploadthing/react";
 import { useRouter } from "next/navigation";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
 
 function AuthUser() {
   const router = useRouter();
+  const { address, isConnected } = useAccount();
 
   const [matricNumber, setMatricNumber] = useState("CSC/2022/097");
   const [Private_Key, setPrivate_Key] = useState("");
@@ -182,7 +184,7 @@ function AuthUser() {
               <label className="text-white/60">Wallet Address</label>
               <motion.input
                 className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
-                value={hashedAddress}
+                value={address}
                 readOnly
                 type="text"
                 whileFocus={{ scale: 1.05 }}

@@ -13,8 +13,63 @@ import { useRouter } from "next/navigation";
 // import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
+import { useAccount, useConnect } from "wagmi";
+import { useCallsStatus, useWriteContracts } from "wagmi/experimental";
 
 const Page = () => {
+  const account = useAccount();
+  const { connectors, status } = useConnect();
+
+  const { address, isConnected } = useAccount();
+  const {
+    writeContractsAsync,
+    error: mintError,
+    status: mintStatus,
+    data: id,
+  } = useWriteContracts();
+
+  const { data: callsStatus } = useCallsStatus({
+    id: id,
+    query: {
+      enabled: !!id,
+      // Poll every second until the calls are confirmed
+      refetchInterval: (data) =>
+        data.state.data?.status === "CONFIRMED" ? false : 1000,
+    },
+  });
+
+  async function mint() {
+    try {
+      await writeContractsAsync({
+        contracts: [
+          {
+            address: "0xA2bCe1b3a30Bb9f29092a3501b19FD9E55D36622",
+            abi: NFTAbi,
+            args: [
+              address,
+              BigInt(0), // tokenId
+              BigInt(1), // quantity
+              "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", // currency
+              BigInt(0), // pricePerToken
+              {
+                proof: [],
+                quantityLimitPerWallet: BigInt(
+                  "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+                ),
+                pricePerToken: BigInt(0),
+                currency: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
+              },
+              `0x`, // data
+            ],
+            functionName: "claim",
+          },
+        ],
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   const [fetchedData, setFetchedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFlipped, setIsFlipped] = useState(false);
