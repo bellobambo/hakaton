@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import { DiamondPlus } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { dark, neobrutalism, shadesOfPurple } from "@clerk/themes";
+import CoinbaseButton from "@/app/Components/CoinbaseButton";
 
 export const LandingNavbar = () => {
   const pathname = usePathname();
@@ -30,24 +31,7 @@ export const LandingNavbar = () => {
         </Link>
 
         <div>
-          <SignedIn>
-            <div className="flex gap-6 items-center">
-              <UserButton
-                showName
-                appearance={{
-                  baseTheme: shadesOfPurple,
-                }}
-                className="text-[70px] text-white"
-              />
-            </div>
-          </SignedIn>
-          <SignedOut>
-            <SignInButton mode="modal" forceRedirectUrl="/details">
-              <Button className="bg-white text-black hover:bg-gray-400">
-                Sign In
-              </Button>
-            </SignInButton>
-          </SignedOut>
+          <CoinbaseButton />
         </div>
       </div>
     </div>

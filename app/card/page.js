@@ -10,7 +10,7 @@ import ReactCardFlip from "react-card-flip";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+// import { useUser } from "@clerk/nextjs";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -19,7 +19,7 @@ const Page = () => {
   const [loading, setLoading] = useState(true);
   const [isFlipped, setIsFlipped] = useState(false);
   const reportRef = useRef();
-  const { user } = useUser();
+  // const { user } = useUser();
   const router = useRouter();
   const [balance, setBalance] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,13 +42,13 @@ const Page = () => {
     }, 300);
   };
 
-  useEffect(() => {
-    if (user === undefined) return;
+  // useEffect(() => {
+  //   if (user === undefined) return;
 
-    if (!user) {
-      router.push("/");
-    }
-  }, [user, router]);
+  //   if (!user) {
+  //     router.push("/");
+  //   }
+  // }, [user, router]);
 
   const handleFlip = () => {
     setIsFlipped(!isFlipped);

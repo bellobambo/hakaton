@@ -1,5 +1,5 @@
 "use client";
-import { useUser } from "@clerk/nextjs";
+
 import React, { useState, useEffect } from "react";
 // import { useRouter } from "next/router";
 import { motion } from "framer-motion";
@@ -10,7 +10,6 @@ import { UploadButton, UploadDropzone } from "@uploadthing/react";
 import { useRouter } from "next/navigation";
 
 function AuthUser() {
-  const { user } = useUser();
   const router = useRouter();
 
   const [matricNumber, setMatricNumber] = useState("CSC/2022/097");
@@ -77,14 +76,6 @@ function AuthUser() {
     },
   };
 
-  if (!user) {
-    return (
-      <div className="flex justify-center items-center">
-        <Loader />
-      </div>
-    );
-  }
-
   const handleCreateId = async (e) => {
     e.preventDefault();
 
@@ -138,7 +129,7 @@ function AuthUser() {
         >
           <motion.div className="" variants={textVariants}>
             <p className="text-xl font-medium mb-1.5">
-              Welcome, {user.fullName}.
+              {/* Welcome, {user.fullName}. */}
             </p>
             <p className="text-white/60 mb-4 ">
               Confirm Details To Request/Access Your University ID
@@ -176,7 +167,7 @@ function AuthUser() {
               <motion.input
                 className="border-b-2 bg-transparent border-purple-900 focus:outline-none text-white/60 w-full max-w-xs"
                 type="text"
-                value={name || user.fullName || " "}
+                value={name}
                 onChange={(e) => setName(e.target.value)}
                 whileFocus={{ scale: 1.05 }}
               />

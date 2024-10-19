@@ -9,7 +9,6 @@ import {
 } from "@clerk/nextjs";
 import SignIn from "./Components/SignIn";
 import "@uploadthing/react/styles.css";
-import User from "./Components/User";
 import { dark, neobrutalism, shadesOfPurple } from "@clerk/themes";
 import Providers from "./providers";
 
@@ -32,7 +31,6 @@ export default function RootLayout({ children }) {
       <html lang="en">
         <body className={inter.className}>
           {/* <SignIn /> */}
-          <User />
 
           <div className="max-w-screen-2xl mx-auto">
             <Providers>{children}</Providers>
