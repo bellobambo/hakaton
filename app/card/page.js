@@ -17,8 +17,19 @@ import { useCallsStatus, useWriteContracts } from "wagmi/experimental";
 import { useAccount, useConnect } from "wagmi";
 import TransactionStatus from "../Components/TransactionStatus";
 import NFTAbi from "@/abi/NFT";
+import { 
+  useSendTransaction, 
+  useWaitForTransactionReceipt 
+} from 'wagmi' 
+import { parseEther } from 'viem' 
 
 const Page = () => {
+  const { 
+    data: hash,
+    error,
+    isPending, 
+    sendTransaction 
+  } = useSendTransaction() 
   const [fetchedData, setFetchedData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFlipped, setIsFlipped] = useState(false);
@@ -218,6 +229,24 @@ async function mint() {
 }
 
 
+async function submit(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(e.target);
+  const to = formData.get('address'); // Assuming the 'address' input value is correctly formatted.
+  const value = formData.get('value');
+  
+  sendTransaction({ to, value: ethers.utils.parseEther(value) });
+}
+
+const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+  hash,
+});
+
+
+
+
+
   return (
     <div className="min-h-screen card-gradient ">
       <Toaster position="top-right" reverseOrder={false} />
@@ -366,7 +395,7 @@ async function mint() {
                 <small className="mb-8">
                   Wallet Address {latestData.Wallet}
                 </small>
-                <form onSubmit={handlePay}>
+                <form onSubmit={submit}>
                   <div className="form-group my-8">
                     <label
                       htmlFor="walletAddress"
@@ -374,13 +403,18 @@ async function mint() {
                     >
                       Receiver Wallet Address
                     </label>
+
+
+
+  
+
+
                     <input
                       type="text"
-                      id="walletAddress"
+                
                       className="mt-1 w-full p-2 border border-gray-300 rounded text-black"
-                      value={walletAddress}
-                      onChange={(e) => setWalletAddress(e.target.value)}
-                      required
+                      name="address" placeholder="0xA0Cf…251e" required
+                      
                     />
                   </div>
 
@@ -390,25 +424,32 @@ async function mint() {
                     </label>
                     <input
                       type="number"
-                      id="amount"
+                 
                       className="mt-1 w-full p-2 border border-gray-300 rounded text-black"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
+                      name="value" placeholder="0.05" required
                       required
                     />
                   </div>
                   {isConnected ? (
                 <div className="text-white">
-                    <h2>Mint</h2>
-                    <span onClick={mint} isLoading={mintStatus === "pending"}>
-                        {mintStatus === "pending" ? "Loading..." : "Mint"}
-                    </span>
-                    <div>writeContracts Status: {mintStatus}</div>
-                    <div>{mintError?.message}</div>
-                    <TransactionStatus callStatus={callsStatus} />
+                     <button 
+        disabled={isPending} 
+        type="submit"
+        className="mt-4 w-full text-center text-white bg-purple-700 hover:underline  p-2 no-underline"
+        >
+        {isPending ? 'Confirming...' : 'Send'} 
+      </button>
                 </div>
             ) : null}
                 </form>
+
+                {hash && <div>Transaction Hash: {hash}</div>} 
+      {isConfirming && <div>Waiting for confirmation...</div>} 
+      {isConfirmed && <div>Transaction confirmed.</div>} 
+      {error && (
+        <div>Error: { error.message}</div>
+      )}
+
                 <button
                   onClick={closeModal}
                   className="mt-4 w-full text-center text-purple-700 hover:underline border-2 p-2 no-underline"
