@@ -302,12 +302,13 @@ const Page = () => {
               onClick={closeModal}
             >
               <motion.div
-                className="bg-black p-6 rounded-lg shadow-lg max-w-[500px] w-full "
+                className="bg-black p-6 rounded-lg shadow-lg max-w-[500px] w-full"
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -100, opacity: 0 }}
                 transition={{ duration: 0.5, ease: "easeOut" }}
                 onClick={(e) => e.stopPropagation()}
+                style={{ overflow: "hidden", wordBreak: "break-word" }} // Add overflow and word-break
               >
                 <div className="text-white">
                   <h2>Account</h2>
@@ -315,15 +316,16 @@ const Page = () => {
                   <div>
                     status: {account.status}
                     {/* <br />
-                    addresses: {JSON.stringify(account.addresses)}
-                    <br />
-                    chainId: {account.chainId} */}
+                addresses: {JSON.stringify(account.addresses)}
+                <br />
+                chainId: {account.chainId} */}
                   </div>
                 </div>
 
                 <small className="mb-8">
-                  Wallet Address {latestData.Wallet}
+                  Wallet Address: {latestData.Wallet}
                 </small>
+
                 <form onSubmit={submit}>
                   <div className="form-group my-8">
                     <label
@@ -338,6 +340,7 @@ const Page = () => {
                       name="address"
                       placeholder="0xA0Cf…251e"
                       required
+                      style={{ overflow: "hidden", wordBreak: "break-word" }} // Handle long input text
                     />
                   </div>
 
@@ -350,7 +353,7 @@ const Page = () => {
                       className="mt-1 w-full p-2 border border-gray-300 rounded text-black"
                       name="value"
                       placeholder="0.05"
-                      step="any" // Allows decimal input
+                      step="any"
                       required
                     />
                   </div>
@@ -360,7 +363,7 @@ const Page = () => {
                       <button
                         disabled={isPending}
                         type="submit"
-                        className="mt-4 w-full text-center text-white bg-purple-700 hover:underline  p-2 no-underline"
+                        className="mt-4 w-full text-center text-white bg-purple-700 hover:underline p-2 no-underline"
                       >
                         {isPending ? "Confirming..." : "Send"}
                       </button>
